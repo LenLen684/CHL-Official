@@ -1,0 +1,25 @@
+{
+  "name": "chl-official-backend",
+  "version": "1.0.0",
+  "description": "Express backend for CHL-Official site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LenLen684/CHL-Official-Backend.git"
+  },
+  "author": "Lene Lefiti",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LenLen684/CHL-Official-Backend/issues"
+  },
+  "homepage": "https://github.com/LenLen684/CHL-Official-Backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.2"
+  }
+}
