@@ -1,0 +1,26 @@
+import React from 'react'
+import { useState } from "react";
+import { NavLink } from 'react-router-dom'
+import Logo from '../assets/logo1.svg?react'
+
+
+function Navbar() {
+    const linkClasses = 'flex shrink-0 items-center rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white'
+    return (
+        <nav className='flex navbar bg-gray-800/70 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10'>
+            <div className='w-[80%] '>
+                <div className='flex flex-1 items-center justify-center sm:items-stretch sm:justify-start '>
+                    <NavLink to='/' className={linkClasses}>
+                        <Logo className='h-14 w-auto text-rose-300 fill-current' />
+                    </NavLink>
+                    <NavLink to='/league' className={linkClasses}>League History</NavLink>
+                    <NavLink to='/valorant' className={linkClasses}>Valorant Stats</NavLink>
+                    <NavLink to='/about' className={linkClasses}>About Us</NavLink>
+                </div>
+            </div>
+        </nav>
+    )
+}
+
+
+export { Navbar }
