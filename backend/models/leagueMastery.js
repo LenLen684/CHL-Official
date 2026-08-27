@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const masterySchema = mongoose.Schema({
+const leagueMasterySchema = mongoose.Schema({
     puuid: String,
     championID: Number,
     championLevel: Number,
@@ -8,4 +8,4 @@ const masterySchema = mongoose.Schema({
     milestoneGrades: [String],
 });
 
-mongoose.model('Masteries', masterySchema)
+mongoose.model('LeagueMasteries', leagueMasterySchema)

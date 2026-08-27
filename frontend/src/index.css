@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-chl-blue: #89bcfdff;
+  --color-background-blue: #2a143bff;
+}
+
+
 :root{
   /* color-scheme: light; */
   color-scheme: light dark;

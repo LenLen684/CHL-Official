@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const gameSchema = mongoose.Schema({
+const leagueGameSchema = mongoose.Schema({
     gameID: String,
     participantIDS: [String],
     info: {
@@ -31,4 +31,4 @@ const gameSchema = mongoose.Schema({
     }
 });
 
-mongoose.model('Games', gameSchema)
+mongoose.model('LeagueGames', leagueGameSchema)

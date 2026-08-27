@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const gameSchema = require('../models/leagueGame');
-const userSchema = require('../models/riotUser');
+const leagueUserSchema = require('../models/leagueUser');
 const masterySchema = require('../models/leagueMastery');
 require('dotenv').config()
 
@@ -14,7 +14,7 @@ mongoose.connection.on('error', console.error.bind(console, 'connection error:')
 
 // USERS DATA
 
-const users = mongoose.model('Users');
+const users = mongoose.model('LeagueUsers');
 
 
 async function createUser(name, tag, puuid) {
@@ -81,7 +81,7 @@ function deleteUser(puuid) {
 
 // GAME DATA
 // These will operate under the assumption we're filtering the data before saving
-var games = mongoose.model('Games');
+var games = mongoose.model('LeagueGames');
 
 async function createGame(gameID, gameData) {
     var game = await readGame(gameID);
@@ -173,7 +173,7 @@ function deleteGame(gameID) {
 
 
 // MASTERY DATA
-var masteries = mongoose.model('Masteries');
+var masteries = mongoose.model('LeagueMasteries');
 async function createMastery(puuid, championID, championLevel, championPoints, milestoneGrades) {
     var dbMastery = await readMasteryByChampion(puuid, championID);
     if (dbMastery) {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const leagueUserSchema = new mongoose.Schema({
     name: {
         type:String,
         reqire:true
@@ -15,4 +15,4 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-mongoose.model('Users', userSchema);
+mongoose.model('LeagueUsers', leagueUserSchema);

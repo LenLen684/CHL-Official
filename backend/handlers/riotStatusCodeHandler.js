@@ -17,21 +17,14 @@ var masteryRefresh = []
 
 // THROWS ERROR
 //400 - Bad Request
-
 //401 - Unauthorized
-
 //403 - Forbidden
-
 //404 - Data not found
-
 //405 - Method not allowed
-
 //415 - Unsupported media type
-
 
 // HANDLED WITH TIMERS
 //429 - Rate limit exceeded MOST IMPORTANT ONE
-
 
 //500 - Internal server error
 //502 - Bad gateway
