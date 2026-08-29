@@ -11,40 +11,6 @@ var pastCallTimer = {
 
 function setTimer(res) {
     pastCallTimer.lastCode = res.status;
-    if (res.ok) {
-        pastCallTimer.recall = true;
-        return;
-    } else {
-        pastCallTimer.recall = false;
-    }
-    console.log(res.status, res.statusText);
-
-    switch (res.status) {
-        case 429:
-            setTimeout(() => {
-                pastCallTimer.recall = true;
-            }, 120000);
-            break;
-        case 400:
-        case 401:
-        case 403:
-        case 404:
-        case 405:
-        case 415:
-            console.error(`Call errors, code: ${res.status}`);
-            pastCallTimer.recall = false;
-            break;
-        case 500:
-        case 502:
-        case 504:
-            console.error(`Server errors, code: ${res.status}`)
-            setTimeout(() => {
-                pastCallTimer.recall = true;
-            }, 300000);
-            break;
-        default:
-            break;
-    }
 }
 
 function apiCall(url, req) {
@@ -71,19 +37,66 @@ function apiCall(url, req) {
 
 async function getAccountByRiotID(name, tag) {
     var account = await apiCall(`https://api.henrikdev.xyz/valorant/v2/account/${name}/${tag}`);
-    //There's an issue here where we're not getting the user because of the lack of a PUUID, we'll use the one from riot if it exists
     const data = account.data
     var dbAccount = await valorantDB.readUser(name, tag, data.puuid);
-    // console.log('account empty ', emptyObject(account), 'dbaccount empty ', emptyObject(dbAccount));
-    // console.log('dbAccount', dbAccount)
     if (!emptyObject(account.data) && !emptyObject(dbAccount)) {
         console.log('Hit update user')
-        dbAccount = await valorantDB.updateUser(data.gameName, data.tag, data.puuid, data.account_level, data.title, data.card);
+        dbAccount = await valorantDB.updateUser(data.name, data.tag, data.puuid, data.account_level, data.title, data.card);
     } else if (emptyObject(dbAccount) && !emptyObject(account.data)) {
         console.log('Hit create user')
-        dbAccount = await valorantDB.createUser(data.gameName, data.tag, data.puuid, data.region, data.account_level, data.title, data.card);
+        // console.log()
+        dbAccount = await valorantDB.createUser(data.name, data.tag, data.puuid, data.region, data.account_level, data.title, data.card);
     }
     return dbAccount;
+}
+
+async function getMatchesByName(name, tag, count) {
+    let size = ''
+    if (count) {
+        size = `?size=${count}`
+    }
+    // Due to the nature of this call, the call must happen first.
+    var matches = await apiCall(`https://api.henrikdev.xyz/valorant/v4/matches/na/pc/${name}/${tag}${size}`);
+    // console.log(matches)
+    var results = []
+
+    for (let index = 0; index < matches.data.length; index++) {
+        const match = matches.data[index];
+
+        let gameID = match.metadata.match_id
+        var dbGame = await valorantDB.readGame(gameID);
+        if (!emptyObject(dbGame)) {
+            console.log('Game Not empty')
+            results.push(dbGame);
+        } else {
+            console.log('Game Empty')
+            var filteredGame = gameDataFilter(match);
+            dbGame = await valorantDB.createGame(gameID, filteredGame);
+            results.push(dbGame);
+        }
+    };
+
+    return results;
+}
+
+async function getLastLiveMatch(name, tag) {
+    // Due to the nature of this call, the call must happen first.
+    var matches = await apiCall(`https://api.henrikdev.xyz/valorant/v4/matches/na/pc/${name}/${tag}?size=1`);
+    var results = []
+    const match = matches.data[0];
+
+    let gameID = match.metadata.match_id
+    var dbGame = await valorantDB.readGame(gameID);
+    if (!emptyObject(dbGame)) {
+        console.log('Game Not empty')
+        results.push(dbGame);
+    } else {
+        console.log('Game Empty')
+        var filteredGame = gameDataFilter(match);
+        dbGame = await valorantDB.createGame(gameID, filteredGame);
+        results.push(dbGame);
+    }
+    return results
 }
 
 
@@ -98,5 +111,53 @@ function emptyObject(data) {
     return true;
 }
 
+// Take the raw Game data and filter only for the things we need
+function gameDataFilter(rawData) {
+    // console.log(rawData)
+    let players = []
 
-module.exports = {getAccountByRiotID}
+    for (let index = 0; index < rawData.players.length; index++) {
+        const p = rawData.players[index];
+
+        let player = {
+            puuid: p.puuid,
+            name: p.name,
+            tag: p.tag,
+            team: p.team_id,
+            agent: {
+                uuid: p.agent.id,
+                name: p.agent.name
+            },
+            stats: {
+                kills: p.stats.kills,
+                deaths: p.stats.deaths,
+                assists: p.stats.assists,
+                damage: p.stats.damage.dealt,
+            },
+            ability_casts: {
+                signature: p.ability_casts.grenade,
+                ability1: p.ability_casts.ability1,
+                ability2: p.ability_casts.ability2,
+                ultimate: p.ability_casts.ultimate
+            }
+        }
+        players.push(player)
+    }
+
+    let game = {
+        match_id: rawData.metadata.match_id,
+        map: {
+            id: rawData.metadata.map.id,
+            name: rawData.metadata.map.name
+        },
+        gamemode: {
+            name: rawData.metadata.queue.name,
+            modetype: rawData.metadata.queue.mode_type
+        },
+        players: players
+    }
+    return game;
+}
+
+
+module.exports = { getAccountByRiotID, getMatchesByName, getLastLiveMatch }

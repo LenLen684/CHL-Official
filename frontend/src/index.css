@@ -1,12 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-chl-blue: #89bcfdff;
-  --color-background-blue: #2a143bff;
+  --color-chl-blue: #6ccbf7ff;
+  --color-background-blue: #261336ff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-7.5vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 
-:root{
+:root {
   /* color-scheme: light; */
   color-scheme: light dark;
 }

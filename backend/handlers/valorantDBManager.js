@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-// const gameSchema = require('../models/leagueGame');
-const leagueUserSchema = require('../models/valorantUser');
+const valUserSchema = require('../models/valorantUser');
+const valGameSchema = require('../models/valorantGame');
 require('dotenv').config()
 
 //This file will take on the role of handling the league db connections
@@ -83,4 +83,71 @@ function deleteUser(puuid) {
     }
 }
 
-module.exports = { createUser, readUser, updateUser, deleteUser }
+
+
+// GAME DATA
+var games = mongoose.model('ValGame');
+
+async function createGame(gameID, gameData) {
+    var game = await readGame(gameID);
+    if (game) {
+        return;
+    } else {
+        // console.log(gameData)
+        game = new games(gameData)
+        console.log(game)
+        await game.save().catch((err) => {
+            if (err) {
+                // console.error.bind(err);
+                console.error(err);
+            }
+        })
+    }
+
+    return game;
+}
+
+async function readGame(gameID) {
+    var foundGame = await games.findOne({ match_id: gameID })
+        .exec().then((game) => {
+            // console.log("Found game: ", game)
+            return game
+        });
+    return foundGame;
+}
+
+async function readGameBy(gameID) {
+    var foundGame = await games.findOne({ match_id: gameID })
+        .exec().then((game) => {
+            // console.log("Found game: ", game)
+            return game
+        });
+    return foundGame;
+}
+
+// async function updateGame(gameID, gameData) {
+//     var game = await readGame(gameID);
+//     if (game) {
+//         game.participantIDS = gameData.participantIDS
+//         game.info = gameData.info
+
+//         await game.save().catch((err) => {
+//             if (err) {
+//                 console.error.bind('err');
+//             }
+//         })
+//     }
+//     return game
+// }
+
+function deleteGame(gameID) {
+    var game = readGame(gameID);
+    if (game) {
+        game.deleteOne({ match_id: gameID }, err => {
+            if (err) console.err(err);
+        })
+    }
+}
+
+
+module.exports = { createUser, readUser, updateUser, deleteUser,  createGame, readGame, deleteGame,}

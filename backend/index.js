@@ -27,6 +27,11 @@ app.use(cors());
 // VALORANT
 {
     // ACCOUNT DATA
+    app.get('/saved/valorant/account/:name/:tag', val.getSavedUser)
     app.get('/valorant/account-by-name/:name/:tag', val.getUser)
+
+    // GAMES
+    app.get('/valorant/last-game/:name/:tag', (req, res) => val.getLastMatch(req, res));
+    app.get('/valorant/games-by-name/:name/:tag', (req, res) => val.getMatchesByName(req, res));
 }
 app.listen(8080, '127.0.0.1', () => console.log('Server running on port 8080'));
