@@ -116,8 +116,8 @@ async function readGame(gameID) {
     return foundGame;
 }
 
-async function readGameBy(gameID) {
-    var foundGame = await games.findOne({ match_id: gameID })
+async function readLastGameByName(name) {
+    var foundGame = await games.findOne({ "players.name": name }).sort({date: -1})
         .exec().then((game) => {
             // console.log("Found game: ", game)
             return game
@@ -125,20 +125,20 @@ async function readGameBy(gameID) {
     return foundGame;
 }
 
-// async function updateGame(gameID, gameData) {
-//     var game = await readGame(gameID);
-//     if (game) {
-//         game.participantIDS = gameData.participantIDS
-//         game.info = gameData.info
-
-//         await game.save().catch((err) => {
-//             if (err) {
-//                 console.error.bind('err');
-//             }
-//         })
-//     }
-//     return game
-// }
+async function readLastCharacterPlayed(name, tag){
+    console.log("Getting last character played")
+    var foundGame = await games.findOne({ "players.name" : name }).select({
+        _id: 0, 
+        outcome: 1,
+        players: {
+            $elemMatch: {name: name}
+        }
+    })
+        .exec().then((game) => {
+            return game
+        });
+    return foundGame;
+}
 
 function deleteGame(gameID) {
     var game = readGame(gameID);
@@ -150,4 +150,4 @@ function deleteGame(gameID) {
 }
 
 
-module.exports = { createUser, readUser, updateUser, deleteUser,  createGame, readGame, deleteGame,}
+module.exports = { createUser, readUser, updateUser, deleteUser,  createGame, readGame, deleteGame, readLastGameByName, readLastCharacterPlayed}

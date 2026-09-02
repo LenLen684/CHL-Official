@@ -22,9 +22,14 @@ function apiCall(url, req) {
             },
             body: req
         }).then(res => {
-            setTimer(res);
-            // console.log('Fetched data',res);
-            return res.json()
+            if (res.ok) {
+                setTimer(res);
+                // console.log('Fetched data',res);
+                return res.json()
+            } else {
+                return {}
+
+            }
         }).then(text => {
             // console.log('Jsonified content ', text)
             return text
@@ -79,11 +84,59 @@ async function getMatchesByName(name, tag, count) {
     return results;
 }
 
+
+// If not careful, this could stop before fully populating, for now we'll make the call larger
+async function fillMatchHistory(name, tag) {
+    let size = `?size=5`
+    let page = 0;
+    let lastCalled = ''
+    do {
+        var matches = await apiCall(`https://api.henrikdev.xyz/valorant/v4/matches/na/pc/${name}/${tag}${size}&start=${page}`);
+        console.log(matches)
+        if (!emptyObject(matches)) {
+            for (let index = 0; index < matches.data.length; index++) {
+                const match = matches.data[index];
+                let gameID = match.metadata.match_id
+                var dbGame = await valorantDB.readGame(gameID);
+                console.log(gameID)
+                if (emptyObject(dbGame)) {
+                    var filteredGame = gameDataFilter(match);
+                    await valorantDB.createGame(gameID, filteredGame);
+                }
+                lastCalled = gameID
+            };
+            page += 1
+        }
+    } while (!valorantDB.readGame(lastCalled) || page < 3);
+    console.log("Match history fill complete")
+}
+
 async function getLastLiveMatch(name, tag) {
     // Due to the nature of this call, the call must happen first.
     var matches = await apiCall(`https://api.henrikdev.xyz/valorant/v4/matches/na/pc/${name}/${tag}?size=1`);
     var results = []
     const match = matches.data[0];
+
+    let gameID = match.metadata.match_id
+    var dbGame = await valorantDB.readGame(gameID);
+    if (!emptyObject(dbGame)) {
+        console.log('Game Not empty')
+        results.push(dbGame);
+    } else {
+        console.log('Game Empty')
+        var filteredGame = gameDataFilter(match);
+        dbGame = await valorantDB.createGame(gameID, filteredGame);
+        results.push(dbGame);
+        getMatchesByName(name, tag, 5)
+    }
+    return results
+}
+
+async function getMatchByGameID(id) {
+    // Due to the nature of this call, the call must happen first.
+    var matches = await apiCall(`https://api.henrikdev.xyz/valorant/v4/match/na/${id}`);
+    var results = []
+    const match = matches.data;
 
     let gameID = match.metadata.match_id
     var dbGame = await valorantDB.readGame(gameID);
@@ -113,7 +166,7 @@ function emptyObject(data) {
 
 // Take the raw Game data and filter only for the things we need
 function gameDataFilter(rawData) {
-    // console.log(rawData)
+    console.log(rawData.metadata.started_at)
     let players = []
 
     for (let index = 0; index < rawData.players.length; index++) {
@@ -144,7 +197,26 @@ function gameDataFilter(rawData) {
         players.push(player)
     }
 
+
+    let outcome = {}
+    for (let index = 0; index < rawData.players.length; index++) {
+        const t = rawData.teams[index];
+
+        if (t.won) {
+            outcome = {
+                winning_team: t.team_id,
+                rounds: {
+                    won: t.rounds.won,
+                    lost: t.rounds.lost
+                }
+            }
+            break;
+        }
+    }
+
+
     let game = {
+        date: rawData.metadata.started_at,
         match_id: rawData.metadata.match_id,
         map: {
             id: rawData.metadata.map.id,
@@ -154,10 +226,11 @@ function gameDataFilter(rawData) {
             name: rawData.metadata.queue.name,
             modetype: rawData.metadata.queue.mode_type
         },
+        outcome: outcome,
         players: players
     }
     return game;
 }
 
 
-module.exports = { getAccountByRiotID, getMatchesByName, getLastLiveMatch }
+module.exports = { getAccountByRiotID, getMatchesByName, getLastLiveMatch, fillMatchHistory, getMatchByGameID }

@@ -114,70 +114,6 @@ const valorant_agent_ids = [
     "add6443a-41bd-e414-f6ad-e58d267f4e95"
 ]
 
-
-function Card({ name, tag, children }) {
-    const [active, setActive] = useState(false)
-    const [style, setStyle] = useState(`relative w-full max-w-2xs p-8 sm:p-5 rounded-2xl transition-all duration-500 ease-out
-                    bg-white/10 backdrop-blur-md overflow-hidden
-                    border border-white/20 border-b-white/10 border-r-white/10
-                    transform-[rotateX(15deg)_rotateY(-15deg)_translateZ(20px)]
-                    shadow-[20px_20px_50px_rgba(0,0,0,0.2)]
-                    hover:transform-[rotateX(5deg)_rotateY(-5deg)_translateZ(60px)]
-                    hover:shadow-[30px_30px_70px_rgba(0,0,0,0.4)]
-                    hover:bg-white/15`)
-
-    const [childStyle, setChildStyle] = useState(`max-h-0 transition-all duration-500 ease-out overflow-hidden`)
-
-
-    const handleActive = () => {
-        setActive(!active)
-        if (active) {
-            setStyle(`relative w-full max-w-2xs p-8 sm:p-5 rounded-2xl transition-all duration-200 ease-in-out
-                    bg-white/10 backdrop-blur-md overflow-hidden
-                    border border-white/20 border-b-white/10 border-r-white/10
-                    transform-[rotateX(15deg)_rotateY(-15deg)_translateZ(20px)]
-                    shadow-[20px_20px_50px_rgba(0,0,0,0.2)]
-                    hover:transform-[rotateX(5deg)_rotateY(-5deg)_translateZ(60px)]
-                    hover:shadow-[30px_30px_70px_rgba(0,0,0,0.4)]
-                    hover:bg-white/15`)
-            setChildStyle(`max-h-0 transition-all duration-300 ease-out overflow-hidden`)
-        } else {
-            setStyle(
-                `relative w-full max-w-lg p-8 sm:p-5 rounded-2xl transition-all duration-200 ease-out
-                backdrop-blur-md overflow-hidden
-                border border-white/20 border-b-white/10 border-r-white/10
-                transform-[rotateX(5deg)_rotateY(-5deg)_translateZ(60px)]
-                shadow-[30px_30px_70px_rgba(0,0,0,0.4)]
-                bg-white/15`)
-
-            setChildStyle(`overflow-hidden max-h-200 transition-all duration-700 ease-in-out animate-fadeIn
-                w-full
-                p-6 rounded-2xl
-                transition-[max-height]
-                backdrop-blur-md 
-                shadow-[30px_30px_70px_rgba(0,0,0,0.4)]
-                bg-white/15
-                grid-rows-[1fr]`)
-        }
-    }
-
-
-    return (
-        <div className="grid grid-cols-[25%_75%] p-4">
-            <div className="">
-                <div onClick={handleActive} className={"cursor-pointer " + style}>
-                    <h1 className="font-extrabold text-xl">{name}</h1>
-                    <p className="font-light text-sm">#{tag}</p>
-                </div>
-            </div>
-            <div className={"duration-300 ease-in-out overflow-hidden " + childStyle}>
-                {children}
-            </div>
-        </div>
-    )
-}
-
-
 function RandomTitle(){
     return RandomID(valorant_title_ids)
 }
@@ -194,4 +130,4 @@ function RandomID(array){
     return array[index]
 }
 
-export { all_members, Card, RandomAgent, RandomCard, RandomTitle}
+export { all_members, RandomAgent, RandomCard, RandomTitle}

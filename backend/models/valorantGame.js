@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema({
+    date: Date,
     match_id: {
         type: String,
         reqire: true
@@ -12,6 +13,13 @@ const gameSchema = new mongoose.Schema({
     gamemode: {
         name: String,
         modetype: String
+    },
+    outcome: {
+        winning_team: String,
+        rounds: {
+            won: Number,
+            lost: Number
+        }
     },
     players: [
         {
