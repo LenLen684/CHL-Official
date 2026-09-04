@@ -130,11 +130,19 @@ function PlayerCard({ name, tag, active }) {
                     const game = data.players[0]
                     setCharacterID(game.agent.uuid)
                     setLastCharacter(`${playerAgentFullURL}${game.agent.uuid}/fullportrait.png`)
-                    setStats(game.stats)
+                    setStats(
+                        {
+                            kills: game.stats.kills,
+                            deaths: game.stats.deaths,
+                            assists: game.stats.assists,
+                            damage: game.stats.damage,
+                            KD: game.stats.deaths > 0 ? (game.stats.kills / game.stats.deaths).toFixed(2) : game.stats.kills
+                        }
+                    )
                     setCasts(game['ability_casts'])
                     setOutcome({
                         totalRounds: data.outcome.rounds.won + data.outcome.rounds.lost,
-                        win: (data.outcome.winning_team == game.team)? "WON" : "LOST"
+                        win: (data.outcome.winning_team == game.team) ? "WON" : "LOST"
                     })
                 } else {
                     const ra = RandomAgent()
@@ -145,7 +153,8 @@ function PlayerCard({ name, tag, active }) {
                         kills: 0,
                         deaths: 0,
                         assists: 0,
-                        damage: 0
+                        damage: 0,
+                        KD: 0
                     })
                     setCasts({
                         signature: 0,
@@ -162,21 +171,38 @@ function PlayerCard({ name, tag, active }) {
     }, [])
 
     return (
-        <div className={`${active ? "" : "hidden "} relative`}>
-            <div className={` relative`}>
+        <div className={`${active ? "" : "hidden "} flex w-full ${outcome && outcome.win == "WON" ? 'bg-green-800/20`' : 'bg-red-800/20`'}`}>
+            <div className={` flex `}>
                 <div className='opacity-0 animate-[fadeInLeft_0.6s_300ms_ease-in-out_forwards] relative w-fit object-cover border-double border-5 border-amber-300/70' >
                     <img src={valCard} className='border-2 border-amber-300' />
                     <span className='opacity-0 animate-[fadeInLeft_0.5s_600ms_ease-in-out_forwards] absolute  block text-center bg-slate-500/75 text-white text-sm font-semibold px-2.5 py-1 top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full'>{valTitle}</span>
                     <span className='opacity-0 animate-[fadeInLeft_0.5s_600ms_ease-in-out_forwards] absolute  bg-amber-50 text-background-blue text-lg font-bold border-4 border-amber-300 rounded-4xl px-1.5 py-1 -top-4.5 left-1/2 -translate-x-1/2'>{valLevel}</span>
                 </div>
-                <div className='w-0.5 h-1 overflow-hidden'>
-                    <img src={lastCharacter} className='opacity-0 animate-[fadeInLeft_0.5s_1400ms_ease-in-out_forwards] absolute inset-0 h-full top-4.5 -left-12 object-contain md:object-cover' />
+                <div className='pl-20 flex flex-row md:flex-col'>
+                    <div>
+                        <span>{outcome && outcome.win}</span>
+                    </div>
+                    {/* stats */}
+                    <div className='h-[70%] grid grid-cols-2 items-center'>
+                        <div >
+                            <StatBase url={null} casts={stats && stats.kills} label="Kills" className="p-4 opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                            <StatBase url={null} casts={stats && stats.deaths} label="Deaths" className="p-4 opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                            <StatBase url={null} casts={stats && stats.assists} label="Assists" className="p-4 opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                        </div>
+                        <div className='col-span-1'>
+                            <StatBase url={null} casts={stats && stats.KD} label="KD" className="p-4 opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                            <StatBase url={null} casts={stats && (outcome.totalRounds > 0 ? (stats.damage / outcome.totalRounds).toFixed(2) : 0)} label="Avg Damage" className="p-4 opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                        </div>
+                    </div>
+                    <div className='flex items-end flex-col md:flex-row'>
+                        <StatBase url={`${playerAgentFullURL}${characterID}/abilities/grenade/displayicon.png`} casts={casts && casts.signature} label="Casts" className="opacity-0 animate-[fadeInLeft_0.5s_1600ms_ease-in-out_forwards]" />
+                        <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ability1/displayicon.png`} casts={casts && casts.ability1} label="Casts" className="opacity-0 animate-[fadeInLeft_0.5s_1800ms_ease-in-out_forwards]" />
+                        <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ability2/displayicon.png`} casts={casts && casts.ability2} label="Casts" className="opacity-0 animate-[fadeInLeft_0.5s_2000ms_ease-in-out_forwards]" />
+                        <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ultimate/displayicon.png`} casts={casts && casts.ultimate} label="Casts" className="opacity-0 animate-[fadeInLeft_0.5s_2200ms_ease-in-out_forwards]" />
+                    </div>
                 </div>
-                <div className='relative '>
-                    <StatBase url={`${playerAgentFullURL}${characterID}/abilities/grenade/displayicon.png`} casts={casts && casts.signature} className=""/>
-                    <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ability1/displayicon.png`}  casts={casts && casts.ability1}/>
-                    <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ability2/displayicon.png`}  casts={casts && casts.ability2}/>
-                    <StatBase url={`${playerAgentFullURL}${characterID}/abilities/ultimate/displayicon.png`}  casts={casts && casts.ultimate}/>
+                <div className='w-0.5 h-1 overflow-hidden'>
+                    <img src={lastCharacter} className='opacity-0 animate-[fadeInLeft_0.5s_1400ms_ease-in-out_forwards] absolute inset-0 h-full top-4 -left-12 object-contain md:object-cover' />
                 </div>
             </div>
         </div>
@@ -184,11 +210,14 @@ function PlayerCard({ name, tag, active }) {
 
 }
 
-function StatBase({ url, casts, className}) {
+function StatBase({ url, label, casts, className }) {
     return (
-        <div className={className + " flex flex-2 items-center"}>
-            <img src={url}></img>
-            <span>Casts: {casts && casts}</span>
+        <div className={className + " flex flex-2 items-center sm:flex-col lg:flex-row lg:px-5"}>
+            <img className='px-2 sm:w-12  md:w-24' src={url}></img>
+            <div className="flex flex-col items-center w-full">
+                <span className='md:text-md font-semibold'>{label}</span>
+                <span className='md:text-lg font-semibold'>{casts && casts}</span>
+            </div>
         </div>
     )
 }

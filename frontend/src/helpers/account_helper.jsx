@@ -4,32 +4,44 @@ import { useEffect, useState } from "react"
 const all_members = [
     {
         name: "CHL Sour Cream",
-        tag: "HelYe"
+        tag: "HelYe",
+        twitch: ""
     },
     {
         name: "CHL Razsmu",
-        tag: "TTV"
+        tag: "TTV",
+        twitch: "https://www.twitch.tv/razsmu"
     },
     {
         name: "CHL Tuzi",
-        tag: "tuzi"
-    },
-    {
-        name: "CHL DoubleM",
-        tag: "TTV"
-    },
-    {
-        name: "CHL Truther",
-        tag: "5798"
-    },
-    {
-        name: "CHL Huginn",
-        tag: "5300"
+        tag: "tuzi",
+        twitch: ""
     },
     {
         name: "CHL OrderedChaos",
-        tag: "7975"
+        tag: "7975",
+        twitch: ""
     },
+    {
+        name: "muhahaha1000",
+        tag: "NA1",
+        twitch: ""
+    },
+    {
+        name: "CHL DoubleM",
+        tag: "TTV",
+        twitch: ""
+    },
+    {
+        name: "CHL Truther",
+        tag: "5798",
+        twitch: "https://www.twitch.tv/alextruther"
+    },
+    {
+        name: "CHL Huginn",
+        tag: "5300",
+        twitch: ""
+    }
 ]
 
 const valorant_card_ids = [
@@ -114,20 +126,20 @@ const valorant_agent_ids = [
     "add6443a-41bd-e414-f6ad-e58d267f4e95"
 ]
 
-function RandomTitle(){
+function RandomTitle() {
     return RandomID(valorant_title_ids)
 }
-function RandomCard(){
+function RandomCard() {
     return RandomID(valorant_card_ids)
 }
-function RandomAgent(){
+function RandomAgent() {
     return RandomID(valorant_agent_ids)
 }
 
 // SUPPORT
-function RandomID(array){
+function RandomID(array) {
     const index = Math.floor(Math.random() * (array.length));
     return array[index]
 }
 
-export { all_members, RandomAgent, RandomCard, RandomTitle}
+export { all_members, RandomAgent, RandomCard, RandomTitle }

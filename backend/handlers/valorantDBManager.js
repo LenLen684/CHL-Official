@@ -127,7 +127,7 @@ async function readLastGameByName(name) {
 
 async function readLastCharacterPlayed(name, tag){
     console.log("Getting last character played")
-    var foundGame = await games.findOne({ "players.name" : name }).select({
+    var foundGame = await games.findOne({ "players.name" : name }).sort({date: -1}).select({
         _id: 0, 
         outcome: 1,
         players: {
